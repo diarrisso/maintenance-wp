@@ -74,15 +74,21 @@
                             </form>
                         @endif
                     @else
-                        <span class="px-3 py-1 bg-success-100 text-success-800 rounded-full text-sm">Gesendet</span>
+                        <div class="flex items-center space-x-2">
+                            <span class="px-3 py-1 bg-success-100 text-success-800 rounded-full text-sm">Bereits gesendet</span>
+                            @if($report->sent_at)
+                                <span class="text-sm text-gray-500">am {{ $report->sent_at->format('d.m.Y H:i') }}</span>
+                            @endif
+                        </div>
                         <a href="{{ route('reports.download', $report) }}" class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg text-sm inline-flex items-center">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                             PDF
                         </a>
                         <form action="{{ route('reports.send-email', $report) }}" method="POST" class="inline" x-data @submit.prevent="confirmAction($el, 'E-Mail erneut senden', 'Möchten Sie die E-Mail erneut senden?', 'Senden')">
                             @csrf
-                            <button type="submit" class="px-3 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg text-sm" title="E-Mail erneut senden">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                            <button type="submit" class="px-3 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg text-sm inline-flex items-center" title="E-Mail erneut senden">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                                Erneut senden
                             </button>
                         </form>
                         @if($report->website->teams_webhook_url)

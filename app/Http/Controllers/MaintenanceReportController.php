@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use App\Services\TeamsNotificationService;
+use App\Mail\ReportReadyForSendingMail;
+use App\Models\User;
 
 class MaintenanceReportController extends Controller
 {
@@ -98,6 +100,11 @@ class MaintenanceReportController extends Controller
         $validated['status'] = 'draft';
         $validated['recommendations'] = $validated['recommendations_text'] ?? null;
         unset($validated['recommendations_text']);
+
+        // Calculer automatiquement le numéro de maintenance pour les clients avec paquet 2x par mois
+        if ($website->client->maintenance_type === '2x_monthly' && empty($validated['maintenance_number'])) {
+            $validated['maintenance_number'] = $this->calculateMaintenanceNumber($website, $validated['maintenance_date']);
+        }
 
         $report = MaintenanceReport::create($validated);
 
@@ -199,6 +206,11 @@ class MaintenanceReportController extends Controller
         $validated['recommendations'] = $validated['recommendations_text'] ?? null;
         unset($validated['recommendations_text']);
 
+        // Calculer automatiquement le numéro de maintenance pour les clients avec paquet 2x par mois
+        if ($report->website->client->maintenance_type === '2x_monthly' && empty($validated['maintenance_number'])) {
+            $validated['maintenance_number'] = $this->calculateMaintenanceNumber($report->website, $validated['maintenance_date']);
+        }
+
         $report->update($validated);
 
         $report->pluginUpdates()->delete();
@@ -263,7 +275,13 @@ class MaintenanceReportController extends Controller
             'next_maintenance_date' => $nextDate,
         ]);
 
-        notify()->success('Wartungsbericht abgeschlossen. PDF wurde erstellt.');
+        // Notifier tous les Managers que le rapport est prêt à être envoyé
+        $managers = User::where('role', User::ROLE_MANAGER)->get();
+        foreach ($managers as $manager) {
+            Mail::to($manager->email)->send(new ReportReadyForSendingMail($report, $manager));
+        }
+
+        notify()->success('Wartungsbericht abgeschlossen. PDF wurde erstellt. Manager wurden benachrichtigt.');
         return redirect()->route('reports.show', $report);
     }
 
@@ -398,11 +416,42 @@ class MaintenanceReportController extends Controller
     {
         $today = Carbon::today();
 
+        // Gérer le cas spécial 2x par mois
+        if ($website->client->maintenance_type === '2x_monthly') {
+            // Vérifier la dernière maintenance
+            $lastReport = MaintenanceReport::where('website_id', $website->id)
+                ->orderBy('maintenance_date', 'desc')
+                ->first();
+
+            if ($lastReport && $lastReport->maintenance_number === 1) {
+                // Si c'était la 1ère maintenance (début du mois) → prochaine = 15 du même mois
+                return $lastReport->maintenance_date->copy()->setDay(15);
+            } else {
+                // Si c'était la 2ème maintenance (milieu du mois) → prochaine = 1er du mois suivant
+                return $today->addMonth()->startOfMonth();
+            }
+        }
+
         return match ($website->maintenance_package) {
             'monthly' => $today->addMonth(),
             'quarterly' => $today->addMonths(3),
             'yearly' => $today->addYear(),
             default => null,
         };
+    }
+
+    /**
+     * Calcule automatiquement le numéro de maintenance (1 ou 2) pour les clients avec paquet 2x par mois
+     * en fonction de la date dans le mois :
+     * - Avant le 15 du mois → 1ère Wartung
+     * - À partir du 15 du mois → 2ème Wartung
+     */
+    private function calculateMaintenanceNumber(Website $website, $maintenanceDate): int
+    {
+        $date = Carbon::parse($maintenanceDate);
+
+        // Si la date est avant le 15 du mois → 1ère wartung
+        // Si la date est le 15 ou après → 2ème wartung
+        return $date->day < 15 ? 1 : 2;
     }
 }
