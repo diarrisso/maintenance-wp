@@ -16,7 +16,7 @@
         .header-title h1 { margin: 0; font-size: 22pt; color: #ffffff; }
         .header-title p { margin: 5px 0 0; font-size: 12pt; color: #ffffff; }
 
-        .client-info { background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 15px 20px; margin: 0 20px 20px; }
+        .client-info { border: 1px solid #e2e8f0; padding: 15px 20px; margin: 0 20px 20px; }
         .client-header { display: table; width: 100%; margin-bottom: 10px; }
         .client-logo { display: table-cell; vertical-align: middle; width: 80px; }
         .client-logo img { max-height: 50px; max-width: 70px; }
@@ -28,13 +28,13 @@
 
         table { width: 100%; border-collapse: collapse; margin: 15px 0; }
         th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid #e5e7eb; }
-        th { background-color: #f3f4f6; font-weight: bold; color: #374151; }
+        th { font-weight: bold; color: #374151; }
 
         .check-ok { color: #059669; font-weight: bold; }
         .check-fail { color: #dc2626; font-weight: bold; }
-        .status-updated { background-color: #d1fae5; color: #065f46; padding: 2px 8px; font-size: 9pt; }
-        .status-skipped { background-color: #fef3c7; color: #92400e; padding: 2px 8px; font-size: 9pt; }
-        .status-no-access { background-color: #fee2e2; color: #991b1b; padding: 2px 8px; font-size: 9pt; }
+        .status-updated { color: #065f46; padding: 2px 8px; font-size: 9pt; font-weight: bold; }
+        .status-skipped { color: #92400e; padding: 2px 8px; font-size: 9pt; font-weight: bold; }
+        .status-no-access { color: #991b1b; padding: 2px 8px; font-size: 9pt; font-weight: bold; }
 
         .info-grid { display: table; width: 100%; margin: 15px 0; }
         .info-row { display: table-row; }
@@ -65,7 +65,7 @@
     </div>
 
     {{-- Informations client avec logo --}}
-    <div class="client-info">
+    <div class="client-info" style="border: 1px solid #e2e8f0; padding: 15px 20px; margin: 0 20px 20px;">
         <div class="client-header">
             @if($report->website->client->logo)
                 <div class="client-logo">
@@ -115,7 +115,7 @@
             ];
             $colors = $conditionColors[$report->website_condition] ?? $conditionColors['good'];
         @endphp
-        <div style="background: {{ $colors['bg'] }}; border: 2px solid {{ $colors['border'] }}; padding: 15px 20px; margin: 0 20px 20px; border-radius: 8px; text-align: center;">
+        <div style="border: 2px solid {{ $colors['border'] }}; padding: 15px 20px; margin: 0 20px 20px; border-radius: 8px; text-align: center;">
             <div style="font-size: 16pt; font-weight: bold; color: {{ $colors['text'] }};">
                 Website-Zustand: {{ $conditionLabels[$report->website_condition] ?? 'Gut' }}
             </div>
@@ -129,7 +129,7 @@
 
     <div class="content">
         {{-- Entwickler/Techniker Box --}}
-        <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid {{ $primaryColor }}; padding: 15px; margin: 20px 0;">
+        <div style="border: 1px solid #e2e8f0; padding: 15px; margin: 20px 0;">
             <h4 style="margin: 0 0 10px; color: {{ $primaryColor }};">Durchgeführt von:</h4>
             @if($report->entwickler)
                 <div class="info-grid">
@@ -227,10 +227,12 @@
         <h2 style="color: {{ $primaryColor }}; border-bottom: 2px solid {{ $primaryColor }}; padding-bottom: 5px; margin-top: 25px; font-size: 14pt;">Phase 3 - Funktionsprüfungen</h2>
         <table>
             <tr><th style="width: 70%;">Prüfung</th><th>Ergebnis</th></tr>
-            <tr>
-                <td>Startseite / Frontend</td>
-                <td style="color: {{ $report->check_frontend ? '#059669' : '#dc2626' }}; font-weight: bold;">{{ $report->check_frontend ? 'OK' : 'Fehler' }}</td>
-            </tr>
+            @if($report->check_frontend !== null)
+                <tr>
+                    <td>Startseite / Frontend</td>
+                    <td style="color: {{ $report->check_frontend ? '#059669' : '#dc2626' }}; font-weight: bold;">{{ $report->check_frontend ? 'OK' : 'Fehler' }}</td>
+                </tr>
+            @endif
             <tr>
                 <td>Navigation / Menüs</td>
                 <td style="color: {{ $report->check_navigation ? '#059669' : '#dc2626' }}; font-weight: bold;">{{ $report->check_navigation ? 'OK' : 'Fehler' }}</td>
@@ -320,21 +322,21 @@
 
             @if($report->security_issues_details)
                 <h3>Sicherheitsprobleme (Details)</h3>
-                <div style="background: #fef2f2; border-left: 4px solid #ef4444; padding: 15px; margin: 10px 0;">
+                <div style="border: 1px solid #ef4444; padding: 15px; margin: 10px 0;">
                     {!! nl2br(e($report->security_issues_details)) !!}
                 </div>
             @endif
 
             @if($report->firewall_notes)
                 <h3>Firewall Konfiguration</h3>
-                <div style="background: #f8fafc; border-left: 4px solid #64748b; padding: 15px; margin: 10px 0;">
+                <div style="border: 1px solid #64748b; padding: 15px; margin: 10px 0;">
                     {!! nl2br(e($report->firewall_notes)) !!}
                 </div>
             @endif
 
             @if($report->security_actions_taken)
                 <h3>Durchgeführte Sicherheitsmaßnahmen</h3>
-                <div style="background: #ecfdf5; border-left: 4px solid #10b981; padding: 15px; margin: 10px 0;">
+                <div style="border: 1px solid #10b981; padding: 15px; margin: 10px 0;">
                     {!! nl2br(e($report->security_actions_taken)) !!}
                 </div>
             @endif
@@ -342,7 +344,7 @@
 
         @if($report->issues_found)
             <h2 style="color: {{ $primaryColor }}; border-bottom: 2px solid {{ $primaryColor }}; padding-bottom: 5px; margin-top: 25px; font-size: 14pt;">Festgestellte Probleme</h2>
-            <div style="background: #fef2f2; border-left: 4px solid #ef4444; padding: 15px; margin: 10px 0;">
+            <div style="border: 1px solid #ef4444; padding: 15px; margin: 10px 0;">
                 {!! nl2br(e($report->issues_found)) !!}
             </div>
         @endif
@@ -362,17 +364,17 @@
             @endphp
             @foreach($report->recommendations as $rec)
                 @php $colors = $priorityColors[$rec->priority] ?? $priorityColors['medium']; @endphp
-                <div style="background: {{ $colors['bg'] }}; border-left: 4px solid {{ $colors['border'] }}; padding: 15px; margin: 10px 0; border-radius: 4px;">
+                <div style="border: 1px solid {{ $colors['border'] }}; padding: 15px; margin: 10px 0; border-radius: 4px;">
                     <div style="display: table; width: 100%;">
                         <div style="display: table-cell; vertical-align: top;">
                             <strong style="color: {{ $colors['text'] }}; font-size: 12pt;">{{ $rec->title }}</strong>
                         </div>
                         <div style="display: table-cell; text-align: right; vertical-align: top; width: 120px;">
-                            <span style="background: {{ $colors['border'] }}; color: white; padding: 2px 8px; border-radius: 4px; font-size: 9pt;">{{ $priorityLabels[$rec->priority] ?? 'Mittel' }}</span>
+                            <span style="border: 1px solid {{ $colors['border'] }}; color: {{ $colors['border'] }}; padding: 2px 8px; border-radius: 4px; font-size: 9pt; font-weight: bold;">{{ $priorityLabels[$rec->priority] ?? 'Mittel' }}</span>
                         </div>
                     </div>
                     <div style="margin-top: 8px; font-size: 10pt; color: #6b7280;">
-                        <span style="background: #e5e7eb; padding: 2px 6px; border-radius: 3px; font-size: 9pt;">{{ $typeLabels[$rec->type] ?? $rec->type }}</span>
+                        <span style="border: 1px solid #9ca3af; padding: 2px 6px; border-radius: 3px; font-size: 9pt;">{{ $typeLabels[$rec->type] ?? $rec->type }}</span>
                         @if($rec->action)
                             <span style="margin-left: 5px;">→ {{ $actionLabels[$rec->action] ?? $rec->action }}</span>
                         @endif
@@ -398,7 +400,7 @@
 
         @if($report->recommendations)
             <h2 style="color: {{ $primaryColor }}; border-bottom: 2px solid {{ $primaryColor }}; padding-bottom: 5px; margin-top: 25px; font-size: 14pt;">Zusätzliche Hinweise</h2>
-            <div style="background: #eff6ff; border-left: 4px solid #3b82f6; padding: 15px; margin: 10px 0;">
+            <div style="border: 1px solid #3b82f6; padding: 15px; margin: 10px 0;">
                 {!! nl2br(e($report->recommendations)) !!}
             </div>
         @endif
@@ -409,7 +411,7 @@
         @endif
     </div>
 
-    <div style="margin-top: 40px; padding: 20px; border-top: 2px solid {{ $primaryColor }}; text-align: center; font-size: 9pt; color: #6b7280; background-color: #f8fafc;">
+    <div style="margin-top: 40px; padding: 20px; border-top: 2px solid {{ $primaryColor }}; text-align: center; font-size: 9pt; color: #6b7280;">
         <p><strong style="color: {{ $primaryColor }};">{{ $agency->name }}</strong> - WordPress Wartung & Entwicklung</p>
         @if($agency->address_street || $agency->address_city)
             <p>{{ $agency->address_street }}@if($agency->address_street && $agency->address_city), @endif{{ $agency->address_zip }} {{ $agency->address_city }}@if($agency->address_country), {{ $agency->address_country }}@endif</p>

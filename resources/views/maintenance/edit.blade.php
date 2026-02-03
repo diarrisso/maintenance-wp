@@ -78,13 +78,26 @@
                         <input type="date" name="maintenance_date" value="{{ old('maintenance_date', $report->maintenance_date->format('Y-m-d')) }}" required class="w-full rounded-lg border-gray-300">
                     </div>
                     @if($report->website->client->maintenance_type === '2x_monthly')
+                        @php
+                            // Calculer le numéro suggéré basé sur la date du rapport
+                            $reportDate = \Carbon\Carbon::parse(old('maintenance_date', $report->maintenance_date));
+                            // Si avant le 15 du mois → 1ère wartung, sinon → 2ème wartung
+                            $suggestedNumber = $reportDate->day < 15 ? 1 : 2;
+                        @endphp
                         <div>
                             <label class="block text-sm font-medium mb-2">Wartung Nr. <span class="text-red-500">*</span></label>
                             <select name="maintenance_number" required class="w-full rounded-lg border-gray-300">
-                                <option value="1" {{ old('maintenance_number', $report->maintenance_number) == 1 ? 'selected' : '' }}>1. Wartung (Mitte des Monats)</option>
-                                <option value="2" {{ old('maintenance_number', $report->maintenance_number) == 2 ? 'selected' : '' }}>2. Wartung (Ende des Monats)</option>
+                                <option value="1" {{ old('maintenance_number', $report->maintenance_number) == 1 ? 'selected' : '' }}>1. Wartung (Anfang des Monats)</option>
+                                <option value="2" {{ old('maintenance_number', $report->maintenance_number) == 2 ? 'selected' : '' }}>2. Wartung (Mitte des Monats)</option>
                             </select>
-                            <p class="text-xs text-gray-500 mt-1">Paket: {{ $report->website->client->maintenance_type_label }}</p>
+                            <p class="text-xs text-gray-500 mt-1">
+                                Paket: {{ $report->website->client->maintenance_type_label }}
+                                @if($suggestedNumber === ($report->maintenance_number ?? 1))
+                                    <span class="text-green-600 font-medium">• Korrekt für {{ $reportDate->format('d.m.Y') }}</span>
+                                @else
+                                    <span class="text-orange-600 font-medium">• Vorschlag für {{ $reportDate->format('d.m.Y') }}: {{ $suggestedNumber }}. Wartung</span>
+                                @endif
+                            </p>
                         </div>
                     @endif
                     <div>

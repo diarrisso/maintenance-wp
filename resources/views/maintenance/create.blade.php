@@ -70,13 +70,26 @@
                         <input type="date" name="maintenance_date" value="{{ old('maintenance_date', today()->format('Y-m-d')) }}" required class="w-full rounded-lg border-gray-300">
                     </div>
                     @if($website->client->maintenance_type === '2x_monthly')
+                        @php
+                            // Calculer automatiquement le numéro suggéré basé sur la date
+                            $today = \Carbon\Carbon::today();
+                            // Si avant le 15 du mois → 1ère wartung, sinon → 2ème wartung
+                            $suggestedNumber = $today->day < 15 ? 1 : 2;
+                        @endphp
                         <div>
                             <label class="block text-sm font-medium mb-2">Wartung Nr. <span class="text-red-500">*</span></label>
                             <select name="maintenance_number" required class="w-full rounded-lg border-gray-300">
-                                <option value="1" {{ old('maintenance_number', 1) == 1 ? 'selected' : '' }}>1. Wartung (Mitte des Monats)</option>
-                                <option value="2" {{ old('maintenance_number') == 2 ? 'selected' : '' }}>2. Wartung (Ende des Monats)</option>
+                                <option value="1" {{ old('maintenance_number', $suggestedNumber) == 1 ? 'selected' : '' }}>1. Wartung (Anfang des Monats)</option>
+                                <option value="2" {{ old('maintenance_number', $suggestedNumber) == 2 ? 'selected' : '' }}>2. Wartung (Mitte des Monats)</option>
                             </select>
-                            <p class="text-xs text-gray-500 mt-1">Paket: {{ $website->client->maintenance_type_label }}</p>
+                            <p class="text-xs text-gray-500 mt-1">
+                                Paket: {{ $website->client->maintenance_type_label }}
+                                @if($suggestedNumber === 1)
+                                    <span class="text-green-600 font-medium">• Vorschlag: 1. Wartung (vor dem 15.)</span>
+                                @else
+                                    <span class="text-blue-600 font-medium">• Vorschlag: 2. Wartung (ab dem 15.)</span>
+                                @endif
+                            </p>
                         </div>
                     @endif
                     <div>
