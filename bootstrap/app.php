@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -14,6 +15,12 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => \App\Http\Middleware\CheckRole::class,
         ]);
+    })
+    ->withSchedule(function (Schedule $schedule) {
+        // Envoyer les rappels de maintenance tous les jours à 9h00
+        $schedule->command('maintenance:send-reminders')
+            ->dailyAt('09:00')
+            ->timezone('Europe/Berlin');
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
