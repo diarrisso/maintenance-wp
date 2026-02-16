@@ -184,7 +184,7 @@
                     <div>
                         <h4 class="font-semibold mb-3">Empfehlungen für den Kunden</h4>
                         <div class="space-y-3">
-                            @foreach($report->recommendations as $rec)
+                            @foreach($report->recommendations()->get() as $rec)
                                 <div class="border rounded-lg p-4 {{ $rec->priority === 'critical' ? 'bg-red-50 border-red-200' : ($rec->priority === 'high' ? 'bg-orange-50 border-orange-200' : ($rec->priority === 'medium' ? 'bg-yellow-50 border-yellow-200' : 'bg-blue-50 border-blue-200')) }}">
                                     <div class="flex justify-between items-start">
                                         <div class="font-medium">{{ $rec->title }}</div>

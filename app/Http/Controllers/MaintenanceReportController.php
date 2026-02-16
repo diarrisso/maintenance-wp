@@ -64,7 +64,7 @@ class MaintenanceReportController extends Controller
             'check_admin_login' => 'boolean',
             'check_media_upload' => 'boolean',
             'check_no_errors' => 'boolean',
-            'check_woocommerce' => 'nullable|boolean',
+
             'check_ssl' => 'boolean',
             'check_security' => 'boolean',
             'security_plugin' => 'nullable|string',
@@ -173,7 +173,7 @@ class MaintenanceReportController extends Controller
             'check_admin_login' => 'boolean',
             'check_media_upload' => 'boolean',
             'check_no_errors' => 'boolean',
-            'check_woocommerce' => 'nullable|boolean',
+
             'check_ssl' => 'boolean',
             'check_security' => 'boolean',
             'security_plugin' => 'nullable|string',

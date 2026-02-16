@@ -193,7 +193,7 @@
                         <label class="flex items-center"><input type="checkbox" name="check_admin_login" value="1" class="rounded border-gray-300 text-primary-600 mr-2"> Admin-Login OK</label>
                         <label class="flex items-center"><input type="checkbox" name="check_media_upload" value="1" class="rounded border-gray-300 text-primary-600 mr-2"> Medien-Upload OK</label>
                         <label class="flex items-center"><input type="checkbox" name="check_no_errors" value="1" class="rounded border-gray-300 text-primary-600 mr-2"> Keine Log-Fehler</label>
-                        <label class="flex items-center"><input type="checkbox" name="check_woocommerce" value="1" class="rounded border-gray-300 text-primary-600 mr-2"> WooCommerce OK (optional)</label>
+
                         <label class="flex items-center"><input type="checkbox" name="check_ssl" value="1" class="rounded border-gray-300 text-primary-600 mr-2"> SSL/HTTPS OK</label>
                         <label class="flex items-center"><input type="checkbox" name="check_security" value="1" class="rounded border-gray-300 text-primary-600 mr-2"> Sicherheitsscan OK</label>
                     </div>

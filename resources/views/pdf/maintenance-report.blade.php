@@ -263,12 +263,7 @@
                 <td>Keine Log-Fehler</td>
                 <td style="color: {{ $report->check_no_errors ? '#059669' : '#dc2626' }}; font-weight: bold;">{{ $report->check_no_errors ? 'OK' : 'Fehler' }}</td>
             </tr>
-            @if($report->check_woocommerce !== null)
-                <tr>
-                    <td>WooCommerce</td>
-                    <td style="color: {{ $report->check_woocommerce ? '#059669' : '#dc2626' }}; font-weight: bold;">{{ $report->check_woocommerce ? 'OK' : 'Fehler' }}</td>
-                </tr>
-            @endif
+
             <tr>
                 <td>SSL / HTTPS</td>
                 <td style="color: {{ $report->check_ssl ? '#059669' : '#dc2626' }}; font-weight: bold;">{{ $report->check_ssl ? 'OK' : 'Fehler' }}</td>

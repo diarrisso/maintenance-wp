@@ -199,7 +199,7 @@
                         <label class="flex items-center"><input type="checkbox" name="check_admin_login" value="1" {{ $report->check_admin_login ? 'checked' : '' }} class="rounded mr-2"> Admin-Login</label>
                         <label class="flex items-center"><input type="checkbox" name="check_media_upload" value="1" {{ $report->check_media_upload ? 'checked' : '' }} class="rounded mr-2"> Medien-Upload</label>
                         <label class="flex items-center"><input type="checkbox" name="check_no_errors" value="1" {{ $report->check_no_errors ? 'checked' : '' }} class="rounded mr-2"> Keine Fehler</label>
-                        <label class="flex items-center"><input type="checkbox" name="check_woocommerce" value="1" {{ $report->check_woocommerce ? 'checked' : '' }} class="rounded mr-2"> WooCommerce</label>
+
                         <label class="flex items-center"><input type="checkbox" name="check_ssl" value="1" {{ $report->check_ssl ? 'checked' : '' }} class="rounded mr-2"> SSL</label>
                         <label class="flex items-center"><input type="checkbox" name="check_security" value="1" {{ $report->check_security ? 'checked' : '' }} class="rounded mr-2"> Sicherheit</label>
                     </div>

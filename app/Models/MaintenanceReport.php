@@ -49,7 +49,7 @@ class MaintenanceReport extends Model
         'check_admin_login',
         'check_media_upload',
         'check_no_errors',
-        'check_woocommerce',
+
         'check_ssl',
         'check_security',
         'security_plugin',
@@ -104,7 +104,7 @@ class MaintenanceReport extends Model
         'check_admin_login' => 'boolean',
         'check_media_upload' => 'boolean',
         'check_no_errors' => 'boolean',
-        'check_woocommerce' => 'boolean',
+
         'check_ssl' => 'boolean',
         'check_security' => 'boolean',
         'next_maintenance_date' => 'date',
