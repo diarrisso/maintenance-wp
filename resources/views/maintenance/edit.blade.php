@@ -393,8 +393,9 @@
                         <p id="sigConfirmMsg" class="mt-2 text-sm text-green-600 font-medium" style="display: {{ $report->signature ? 'block' : 'none' }};">Unterschrift gespeichert</p>
                     </div>
                     <script>
-                        document.addEventListener('DOMContentLoaded', function() {
+                        (function() {
                             const canvas = document.getElementById('signatureCanvas');
+                            if (!canvas) { console.error('Signature canvas not found'); return; }
                             const ctx = canvas.getContext('2d');
                             const input = document.getElementById('signatureInput');
                             const placeholder = document.getElementById('signaturePlaceholder');
@@ -406,15 +407,16 @@
                             let hasSignature = !!input.value;
                             let lastPoint = null;
 
-                            // Init canvas
+                            // Init canvas with retina support
+                            const W = 500, H = 200;
                             const dpr = window.devicePixelRatio || 1;
-                            canvas.width = 500 * dpr;
-                            canvas.height = 200 * dpr;
-                            canvas.style.width = '500px';
-                            canvas.style.height = '200px';
+                            canvas.width = W * dpr;
+                            canvas.height = H * dpr;
+                            canvas.style.width = W + 'px';
+                            canvas.style.height = H + 'px';
                             ctx.scale(dpr, dpr);
                             ctx.fillStyle = '#ffffff';
-                            ctx.fillRect(0, 0, 500, 200);
+                            ctx.fillRect(0, 0, W, H);
                             ctx.strokeStyle = '#000000';
                             ctx.lineWidth = 2;
                             ctx.lineCap = 'round';
@@ -423,14 +425,14 @@
                             // Load existing signature
                             if (input.value) {
                                 const img = new Image();
-                                img.onload = function() { ctx.drawImage(img, 0, 0, 500, 200); };
+                                img.onload = function() { ctx.drawImage(img, 0, 0, W, H); };
                                 img.src = input.value;
                             }
 
                             function getCoords(e) {
                                 const rect = canvas.getBoundingClientRect();
-                                const scaleX = 500 / rect.width;
-                                const scaleY = 200 / rect.height;
+                                const scaleX = W / rect.width;
+                                const scaleY = H / rect.height;
                                 if (e.touches && e.touches[0]) {
                                     return { x: (e.touches[0].clientX - rect.left) * scaleX, y: (e.touches[0].clientY - rect.top) * scaleY };
                                 }
@@ -476,7 +478,11 @@
                             // Clear button
                             clearBtn.addEventListener('click', function() {
                                 ctx.fillStyle = '#ffffff';
-                                ctx.fillRect(0, 0, 500, 200);
+                                ctx.fillRect(0, 0, W, H);
+                                ctx.strokeStyle = '#000000';
+                                ctx.lineWidth = 2;
+                                ctx.lineCap = 'round';
+                                ctx.lineJoin = 'round';
                                 hasSignature = false;
                                 input.value = '';
                                 if (placeholder) placeholder.style.display = 'flex';
@@ -489,7 +495,9 @@
                                 input.value = canvas.toDataURL('image/png');
                                 confirmMsg.style.display = 'block';
                             });
-                        });
+
+                            console.log('Signature pad initialized successfully');
+                        })();
                     </script>
                 </div>
 
