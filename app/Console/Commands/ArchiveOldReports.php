@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\MaintenanceReport;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 class ArchiveOldReports extends Command
 {
@@ -14,14 +15,22 @@ class ArchiveOldReports extends Command
 
     public function handle(): int
     {
-        $cutoff = Carbon::now()->subWeek();
+        try {
+            $cutoff = Carbon::now()->subWeek();
 
-        $count = MaintenanceReport::where('status', 'sent')
-            ->where('sent_at', '<=', $cutoff)
-            ->update(['status' => 'archived']);
+            $count = MaintenanceReport::where('status', 'sent')
+                ->where('sent_at', '<=', $cutoff)
+                ->update(['status' => 'archived']);
 
-        $this->info("Archived {$count} report(s) older than 1 week.");
+            Log::info("reports:archive-old: {$count} report(s) archived.");
+            $this->info("Archived {$count} report(s) older than 1 week.");
 
-        return self::SUCCESS;
+            return self::SUCCESS;
+        } catch (\Throwable $e) {
+            Log::error("reports:archive-old failed: {$e->getMessage()}");
+            $this->error("Failed: {$e->getMessage()}");
+
+            return self::FAILURE;
+        }
     }
 }

@@ -25,7 +25,14 @@ return Application::configure(basePath: dirname(__DIR__))
         // Archiver automatiquement les rapports envoyés depuis plus d'une semaine
         $schedule->command('reports:archive-old')
             ->dailyAt('02:00')
-            ->timezone('Europe/Berlin');
+            ->timezone('Europe/Berlin')
+            ->onFailure(function () {
+                \Illuminate\Support\Facades\Log::error('CRON reports:archive-old failed');
+                \Illuminate\Support\Facades\Mail::raw(
+                    "Le cron job reports:archive-old a échoué à " . now()->format('d.m.Y H:i') . ".\nVérifiez les logs sur le serveur.",
+                    fn ($msg) => $msg->to('diarrisso@achtzigdreissig.de')->subject('CRON Fehler: reports:archive-old')
+                );
+            });
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
