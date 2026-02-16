@@ -26,6 +26,12 @@ return Application::configure(basePath: dirname(__DIR__))
         $schedule->command('reports:archive-old')
             ->dailyAt('02:00')
             ->timezone('Europe/Berlin')
+            ->onSuccess(function () {
+                \Illuminate\Support\Facades\Mail::raw(
+                    "Le cron job reports:archive-old s'est exécuté avec succès à " . now()->format('d.m.Y H:i') . ".",
+                    fn ($msg) => $msg->to('diarrisso@achtzigdreissig.de')->subject('CRON OK: reports:archive-old')
+                );
+            })
             ->onFailure(function () {
                 \Illuminate\Support\Facades\Log::error('CRON reports:archive-old failed');
                 \Illuminate\Support\Facades\Mail::raw(
