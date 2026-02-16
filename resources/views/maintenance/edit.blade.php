@@ -364,42 +364,126 @@
                 </div>
 
                 <!-- Unterschrift -->
-                <div x-data="signaturePad('{{ $report->signature ? 'existing' : '' }}')" x-init="initCanvas()" x-cloak>
+                <div>
                     <h3 class="font-semibold text-lg mb-4">Unterschrift des Technikers</h3>
                     <div>
                         <div class="relative rounded-lg border-2 border-dashed border-gray-400 bg-white inline-block" style="touch-action: none;">
-                            <canvas x-ref="canvas" style="width: 500px; height: 200px; cursor: crosshair;"
-                                class="rounded-lg"
-                                @mousedown="startDraw($event)"
-                                @mousemove="draw($event)"
-                                @mouseup="stopDraw()"
-                                @mouseleave="stopDraw()"
-                                @touchstart.prevent="startDraw($event)"
-                                @touchmove.prevent="draw($event)"
-                                @touchend="stopDraw()"
-                                @touchcancel="stopDraw()">
-                            </canvas>
-                            <div x-show="!hasDrawn" class="pointer-events-none absolute inset-0 flex items-center justify-center">
+                            <canvas id="sigCanvas" style="width: 500px; height: 200px; cursor: crosshair;" class="rounded-lg"></canvas>
+                            <div id="sigPlaceholder" class="pointer-events-none absolute inset-0 flex items-center justify-center" style="{{ $report->signature ? 'display:none' : '' }}">
                                 <div class="text-center text-gray-400">
                                     <svg class="mx-auto mb-2 h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
                                     <p class="text-sm">Hier unterschreiben</p>
                                 </div>
                             </div>
                         </div>
-                        <input type="hidden" name="signature" x-ref="input" value="{{ $report->signature }}">
+                        <input type="hidden" name="signature" id="sigInput" value="{{ $report->signature }}">
                         <div class="mt-3 flex gap-2">
-                            <button type="button" @click="clearCanvas()"
-                                class="inline-flex items-center rounded-md border px-3 py-1.5 text-sm disabled:opacity-50 hover:bg-gray-50">
-                                Löschen
-                            </button>
-                            <button type="button" @click="saveSignature()"
-                                class="inline-flex items-center rounded-md bg-primary-600 px-3 py-1.5 text-sm text-white hover:bg-primary-700 disabled:opacity-50">
-                                Unterschrift bestätigen
-                            </button>
+                            <button type="button" id="sigClear" class="inline-flex items-center rounded-md border px-3 py-1.5 text-sm hover:bg-gray-50">Löschen</button>
+                            <button type="button" id="sigSave" class="inline-flex items-center rounded-md bg-primary-600 px-3 py-1.5 text-sm text-white hover:bg-primary-700">Unterschrift bestätigen</button>
                         </div>
-                        <p x-show="confirmed" x-transition class="mt-2 text-sm text-green-600 font-medium">Unterschrift gespeichert</p>
+                        <p id="sigMsg" class="mt-2 text-sm text-green-600 font-medium" style="{{ $report->signature ? '' : 'display:none' }}">Unterschrift gespeichert</p>
                     </div>
                 </div>
+                <script>
+                (function initSignaturePad() {
+                    var canvas = document.getElementById('sigCanvas');
+                    if (!canvas) return;
+                    var ctx = canvas.getContext('2d');
+                    var input = document.getElementById('sigInput');
+                    var placeholder = document.getElementById('sigPlaceholder');
+                    var msg = document.getElementById('sigMsg');
+                    var W = 500, H = 200;
+                    var drawing = false, hasDrawn = !!input.value, lx = 0, ly = 0;
+
+                    // Setup canvas (no retina scaling to keep it simple)
+                    canvas.width = W;
+                    canvas.height = H;
+                    ctx.fillStyle = '#fff';
+                    ctx.fillRect(0, 0, W, H);
+                    ctx.strokeStyle = '#000';
+                    ctx.lineWidth = 2;
+                    ctx.lineCap = 'round';
+                    ctx.lineJoin = 'round';
+
+                    // Load existing signature
+                    if (input.value && input.value.indexOf('data:') === 0) {
+                        var img = new Image();
+                        img.onload = function() { ctx.drawImage(img, 0, 0, W, H); };
+                        img.src = input.value;
+                    }
+
+                    function coords(e) {
+                        var r = canvas.getBoundingClientRect();
+                        var x, y;
+                        if (e.touches && e.touches.length > 0) {
+                            x = e.touches[0].clientX - r.left;
+                            y = e.touches[0].clientY - r.top;
+                        } else {
+                            x = e.clientX - r.left;
+                            y = e.clientY - r.top;
+                        }
+                        return { x: x * (W / r.width), y: y * (H / r.height) };
+                    }
+
+                    canvas.onmousedown = function(e) {
+                        drawing = true;
+                        var c = coords(e);
+                        lx = c.x; ly = c.y;
+                        hasDrawn = true;
+                        if (placeholder) placeholder.style.display = 'none';
+                    };
+                    canvas.onmousemove = function(e) {
+                        if (!drawing) return;
+                        var c = coords(e);
+                        ctx.beginPath();
+                        ctx.moveTo(lx, ly);
+                        ctx.lineTo(c.x, c.y);
+                        ctx.stroke();
+                        lx = c.x; ly = c.y;
+                    };
+                    canvas.onmouseup = function() { drawing = false; };
+                    canvas.onmouseleave = function() { drawing = false; };
+
+                    canvas.ontouchstart = function(e) {
+                        e.preventDefault();
+                        drawing = true;
+                        var c = coords(e);
+                        lx = c.x; ly = c.y;
+                        hasDrawn = true;
+                        if (placeholder) placeholder.style.display = 'none';
+                    };
+                    canvas.ontouchmove = function(e) {
+                        e.preventDefault();
+                        if (!drawing) return;
+                        var c = coords(e);
+                        ctx.beginPath();
+                        ctx.moveTo(lx, ly);
+                        ctx.lineTo(c.x, c.y);
+                        ctx.stroke();
+                        lx = c.x; ly = c.y;
+                    };
+                    canvas.ontouchend = function() { drawing = false; };
+
+                    document.getElementById('sigClear').onclick = function() {
+                        ctx.fillStyle = '#fff';
+                        ctx.fillRect(0, 0, W, H);
+                        ctx.strokeStyle = '#000';
+                        ctx.lineWidth = 2;
+                        ctx.lineCap = 'round';
+                        ctx.lineJoin = 'round';
+                        hasDrawn = false;
+                        input.value = '';
+                        if (placeholder) placeholder.style.display = 'flex';
+                        msg.style.display = 'none';
+                    };
+
+                    document.getElementById('sigSave').onclick = function() {
+                        if (!hasDrawn) return;
+                        input.value = canvas.toDataURL('image/png');
+                        msg.style.display = 'block';
+                    };
+                })();
+                </script>
 
                 <div class="flex justify-end space-x-3 pt-6 border-t">
                     <a href="{{ route('reports.show', $report) }}" class="px-4 py-2 border rounded-lg hover:bg-gray-50">Abbrechen</a>
@@ -409,103 +493,4 @@
         </div>
     </div>
 
-    @push('scripts')
-    <script>
-        document.addEventListener('alpine:init', () => {
-            Alpine.data('signaturePad', (hasExisting) => ({
-                isDrawing: false,
-                hasDrawn: hasExisting === 'existing',
-                confirmed: hasExisting === 'existing',
-                lastX: 0,
-                lastY: 0,
-                ctx: null,
-                W: 500,
-                H: 200,
-
-                initCanvas() {
-                    const canvas = this.$refs.canvas;
-                    const dpr = window.devicePixelRatio || 1;
-                    canvas.width = this.W * dpr;
-                    canvas.height = this.H * dpr;
-                    this.ctx = canvas.getContext('2d');
-                    this.ctx.scale(dpr, dpr);
-                    this.ctx.fillStyle = '#ffffff';
-                    this.ctx.fillRect(0, 0, this.W, this.H);
-                    this.ctx.strokeStyle = '#000000';
-                    this.ctx.lineWidth = 2;
-                    this.ctx.lineCap = 'round';
-                    this.ctx.lineJoin = 'round';
-
-                    // Load existing signature
-                    if (this.$refs.input.value && this.$refs.input.value.startsWith('data:')) {
-                        const img = new Image();
-                        img.onload = () => {
-                            this.ctx.drawImage(img, 0, 0, this.W, this.H);
-                        };
-                        img.src = this.$refs.input.value;
-                    }
-                },
-
-                getCoords(e) {
-                    const rect = this.$refs.canvas.getBoundingClientRect();
-                    const scaleX = this.W / rect.width;
-                    const scaleY = this.H / rect.height;
-                    let clientX, clientY;
-                    if (e.touches && e.touches[0]) {
-                        clientX = e.touches[0].clientX;
-                        clientY = e.touches[0].clientY;
-                    } else {
-                        clientX = e.clientX;
-                        clientY = e.clientY;
-                    }
-                    return {
-                        x: (clientX - rect.left) * scaleX,
-                        y: (clientY - rect.top) * scaleY
-                    };
-                },
-
-                startDraw(e) {
-                    this.isDrawing = true;
-                    const coords = this.getCoords(e);
-                    this.lastX = coords.x;
-                    this.lastY = coords.y;
-                    this.hasDrawn = true;
-                },
-
-                draw(e) {
-                    if (!this.isDrawing) return;
-                    const coords = this.getCoords(e);
-                    this.ctx.beginPath();
-                    this.ctx.moveTo(this.lastX, this.lastY);
-                    this.ctx.lineTo(coords.x, coords.y);
-                    this.ctx.stroke();
-                    this.lastX = coords.x;
-                    this.lastY = coords.y;
-                },
-
-                stopDraw() {
-                    this.isDrawing = false;
-                },
-
-                clearCanvas() {
-                    this.ctx.fillStyle = '#ffffff';
-                    this.ctx.fillRect(0, 0, this.W, this.H);
-                    this.ctx.strokeStyle = '#000000';
-                    this.ctx.lineWidth = 2;
-                    this.ctx.lineCap = 'round';
-                    this.ctx.lineJoin = 'round';
-                    this.hasDrawn = false;
-                    this.confirmed = false;
-                    this.$refs.input.value = '';
-                },
-
-                saveSignature() {
-                    if (!this.hasDrawn) return;
-                    this.$refs.input.value = this.$refs.canvas.toDataURL('image/png');
-                    this.confirmed = true;
-                }
-            }));
-        });
-    </script>
-    @endpush
 </x-app-layout>
