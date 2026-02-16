@@ -363,7 +363,7 @@
                 $typeLabels = ['security' => 'Sicherheit', 'plugin' => 'Plugin', 'theme' => 'Theme', 'performance' => 'Performance', 'other' => 'Sonstige'];
                 $actionLabels = ['replace' => 'Ersetzen', 'remove' => 'Entfernen', 'update' => 'Aktualisieren', 'configure' => 'Konfigurieren', 'install' => 'Installieren'];
             @endphp
-            @foreach($report->recommendations as $rec)
+            @foreach($report->recommendations()->get() as $rec)
                 @php $colors = $priorityColors[$rec->priority] ?? $priorityColors['medium']; @endphp
                 <div style="border: 1px solid {{ $colors['border'] }}; padding: 15px; margin: 10px 0; border-radius: 4px;">
                     <div style="display: table; width: 100%;">

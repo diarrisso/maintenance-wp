@@ -293,5 +293,6 @@
 
         <x-notify::notify />
         @notifyJs
+        @stack('scripts')
     </body>
 </html>
