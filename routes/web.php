@@ -19,6 +19,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Reports - Lecture, téléchargement et envoi par mail (developer + manager)
     Route::get('/reports', [MaintenanceReportController::class, 'index'])->name('reports.index');
+    Route::get('/archive', [MaintenanceReportController::class, 'archive'])->name('reports.archive');
+    Route::post('/reports/{report}/archive', [MaintenanceReportController::class, 'archiveReport'])->name('reports.archive-report');
+    Route::post('/reports/{report}/restore', [MaintenanceReportController::class, 'restoreReport'])->name('reports.restore');
     Route::get('/reports/{report}', [MaintenanceReportController::class, 'show'])->name('reports.show');
     Route::get('/reports/{report}/download', [MaintenanceReportController::class, 'download'])->name('reports.download');
     Route::post('/reports/{report}/resend', [MaintenanceReportController::class, 'resend'])->name('reports.resend');

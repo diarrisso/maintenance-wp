@@ -26,6 +26,7 @@ class DashboardController extends Controller
             ->orderBy('next_maintenance_date')
             ->get();
         $recentReports = MaintenanceReport::with(['website.client', 'user'])
+            ->where('status', '!=', 'archived')
             ->orderBy('created_at', 'desc')
             ->limit(5)
             ->get();

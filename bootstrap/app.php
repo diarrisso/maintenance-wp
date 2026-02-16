@@ -21,6 +21,11 @@ return Application::configure(basePath: dirname(__DIR__))
         $schedule->command('maintenance:send-reminders')
             ->dailyAt('09:00')
             ->timezone('Europe/Berlin');
+
+        // Archiver automatiquement les rapports envoyés depuis plus d'une semaine
+        $schedule->command('reports:archive-old')
+            ->dailyAt('02:00')
+            ->timezone('Europe/Berlin');
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

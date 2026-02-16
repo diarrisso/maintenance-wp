@@ -105,6 +105,12 @@
                                 </button>
                             </form>
                         @endif
+                        <form action="{{ route('reports.archive-report', $report) }}" method="POST" class="inline" x-data @submit.prevent="confirmAction($el, 'Bericht archivieren', 'Möchten Sie diesen Bericht archivieren?', 'Archivieren')">
+                            @csrf
+                            <button type="submit" class="px-3 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded-lg text-sm" title="Archivieren">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
+                            </button>
+                        </form>
                         @if(Auth::user()->isDeveloper())
                             <form action="{{ route('reports.duplicate', $report) }}" method="POST" class="inline" x-data @submit.prevent="confirmAction($el, 'Bericht duplizieren', 'Möchten Sie diesen Bericht als neuen Entwurf duplizieren?', 'Duplizieren')">
                                 @csrf

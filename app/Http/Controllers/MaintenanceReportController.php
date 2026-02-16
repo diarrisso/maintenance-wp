@@ -21,10 +21,37 @@ class MaintenanceReportController extends Controller
     public function index()
     {
         $reports = MaintenanceReport::with(['website.client', 'user'])
+            ->where('status', '!=', 'archived')
             ->orderBy('maintenance_date', 'desc')
             ->paginate(20);
 
         return view('reports.index', compact('reports'));
+    }
+
+    public function archive()
+    {
+        $reports = MaintenanceReport::with(['website.client', 'user'])
+            ->where('status', 'archived')
+            ->orderBy('maintenance_date', 'desc')
+            ->paginate(20);
+
+        return view('reports.archive', compact('reports'));
+    }
+
+    public function archiveReport(MaintenanceReport $report)
+    {
+        $report->update(['status' => 'archived']);
+        notify()->success('Bericht wurde archiviert.');
+
+        return redirect()->route('reports.index');
+    }
+
+    public function restoreReport(MaintenanceReport $report)
+    {
+        $report->update(['status' => 'sent']);
+        notify()->success('Bericht wurde wiederhergestellt.');
+
+        return redirect()->route('reports.archive');
     }
 
     public function show(MaintenanceReport $report)
