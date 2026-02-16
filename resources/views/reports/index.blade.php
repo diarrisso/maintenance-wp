@@ -44,6 +44,16 @@
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                                     </a>
                                 @endif
+                                @if(Auth::user()->isDeveloper() && in_array($report->status, ['completed', 'sent']))
+                                    {{-- Duplizieren --}}
+                                    <form action="{{ route('reports.duplicate', $report) }}" method="POST" class="inline" x-data
+                                          @submit.prevent="confirmAction($el, 'Bericht duplizieren', 'Möchten Sie diesen Bericht als neuen Entwurf duplizieren?', 'Duplizieren')">
+                                        @csrf
+                                        <button type="submit" class="p-1.5 text-gray-500 hover:text-indigo-600 hover:bg-gray-100 rounded" title="Duplizieren">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                        </button>
+                                    </form>
+                                @endif
                                 @if(Auth::user()->isDeveloper())
                                     {{-- Bearbeiten --}}
                                     <a href="{{ route('maintenance.edit', $report) }}" class="p-1.5 text-gray-500 hover:text-blue-600 hover:bg-gray-100 rounded" title="Bearbeiten">
