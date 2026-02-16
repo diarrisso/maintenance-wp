@@ -420,13 +420,13 @@
         </table>
 
         @if($report->security_issues_details)
-            <div style="border: 1px solid {{ $red }}; padding: 10px 15px; margin: 10px 0; font-size: 9pt;">
+            <div style="padding: 10px 0; font-size: 9pt;">
                 <strong style="color: {{ $red }};">Sicherheitshinweis:</strong> {!! nl2br(e($report->security_issues_details)) !!}
             </div>
         @endif
 
         @if($report->security_actions_taken)
-            <div style="border: 1px solid {{ $green }}; padding: 10px 15px; margin: 10px 0; font-size: 9pt;">
+            <div style="padding: 10px 0; font-size: 9pt;">
                 <strong style="color: {{ $green }};">Durchgeführte Maßnahmen:</strong> {!! nl2br(e($report->security_actions_taken)) !!}
             </div>
         @endif
