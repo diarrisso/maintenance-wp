@@ -66,6 +66,7 @@ class MaintenanceReport extends Model
         'next_maintenance_date',
         'sent_at',
         'pdf_path',
+        'signature',
     ];
 
     public const FIREWALL_STATUSES = [

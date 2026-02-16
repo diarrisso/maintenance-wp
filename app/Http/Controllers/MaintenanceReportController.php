@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
-use Barryvdh\DomPDF\Facade\Pdf;
+use Spatie\LaravelPdf\Facades\Pdf;
 use Carbon\Carbon;
 use App\Services\TeamsNotificationService;
 use App\Mail\ReportReadyForSendingMail;
@@ -93,6 +93,7 @@ class MaintenanceReportController extends Controller
             'recommendations.*.action' => 'nullable|in:replace,remove,update,configure,install',
             'recommendations.*.current_item' => 'nullable|string',
             'recommendations.*.suggested_item' => 'nullable|string',
+            'signature' => 'nullable|string',
         ]);
 
         $validated['website_id'] = $website->id;
@@ -201,6 +202,7 @@ class MaintenanceReportController extends Controller
             'recommendations.*.action' => 'nullable|in:replace,remove,update,configure,install',
             'recommendations.*.current_item' => 'nullable|string',
             'recommendations.*.suggested_item' => 'nullable|string',
+            'signature' => 'nullable|string',
         ]);
 
         $validated['recommendations'] = $validated['recommendations_text'] ?? null;
@@ -258,12 +260,12 @@ class MaintenanceReportController extends Controller
 
         $report->load(['website.client', 'pluginUpdates', 'recommendations', 'user', 'entwickler']);
 
-        $pdf = Pdf::loadView('pdf.maintenance-report', compact('report'));
-
         $filename = 'wartungsbericht_' . $report->website->name . '_' . $report->maintenance_date->format('Y-m-d') . '.pdf';
         $path = 'reports/' . $filename;
 
-        Storage::disk('public')->put($path, $pdf->output());
+        Pdf::view('pdf.maintenance-report', compact('report'))
+            ->format('a4')
+            ->save(storage_path('app/public/' . $path));
 
         $report->update([
             'status' => 'completed',
@@ -366,12 +368,12 @@ class MaintenanceReportController extends Controller
 
         $report->load(['website.client', 'pluginUpdates', 'recommendations', 'user', 'entwickler']);
 
-        $pdf = Pdf::loadView('pdf.maintenance-report', compact('report'));
-
         $filename = 'wartungsbericht_' . $report->website->name . '_' . $report->maintenance_date->format('Y-m-d') . '.pdf';
         $path = 'reports/' . $filename;
 
-        Storage::disk('public')->put($path, $pdf->output());
+        Pdf::view('pdf.maintenance-report', compact('report'))
+            ->format('a4')
+            ->save(storage_path('app/public/' . $path));
 
         $report->update(['pdf_path' => $path]);
 
@@ -394,6 +396,35 @@ class MaintenanceReportController extends Controller
             notify()->error('E-Mail konnte nicht gesendet werden: ' . $e->getMessage());
             return redirect()->route('reports.show', $report);
         }
+    }
+
+    public function duplicate(MaintenanceReport $report)
+    {
+        $report->load(['pluginUpdates', 'recommendations']);
+
+        $newReport = $report->replicate([
+            'status', 'pdf_path', 'sent_at', 'signature', 'maintenance_number',
+        ]);
+        $newReport->status = 'draft';
+        $newReport->maintenance_date = now();
+        $newReport->user_id = Auth::id();
+        $newReport->save();
+
+        foreach ($report->pluginUpdates as $plugin) {
+            $newReport->pluginUpdates()->create($plugin->only([
+                'plugin_name', 'version_before', 'version_after', 'status', 'notes',
+            ]));
+        }
+
+        foreach ($report->recommendations as $rec) {
+            $newReport->recommendations()->create($rec->only([
+                'type', 'priority', 'title', 'description', 'action',
+                'current_item', 'suggested_item',
+            ]));
+        }
+
+        notify()->success('Bericht wurde dupliziert.');
+        return redirect()->route('maintenance.edit', $newReport);
     }
 
     public function destroy(MaintenanceReport $report)

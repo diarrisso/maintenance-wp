@@ -49,6 +49,7 @@ Route::middleware(['auth', 'verified', 'role:developer'])->group(function () {
     Route::get('/maintenance/{report}/edit', [MaintenanceReportController::class, 'edit'])->name('maintenance.edit');
     Route::put('/maintenance/{report}', [MaintenanceReportController::class, 'update'])->name('maintenance.update');
     Route::post('/maintenance/{report}/complete', [MaintenanceReportController::class, 'complete'])->name('maintenance.complete');
+    Route::post('/reports/{report}/duplicate', [MaintenanceReportController::class, 'duplicate'])->name('reports.duplicate');
     Route::delete('/reports/{report}', [MaintenanceReportController::class, 'destroy'])->name('reports.destroy');
 
     // Administration

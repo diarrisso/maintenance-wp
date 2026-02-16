@@ -56,6 +56,12 @@
                             </form>
                         @endif
                         @if(Auth::user()->isDeveloper())
+                            <form action="{{ route('reports.duplicate', $report) }}" method="POST" class="inline" x-data @submit.prevent="confirmAction($el, 'Bericht duplizieren', 'Möchten Sie diesen Bericht als neuen Entwurf duplizieren?', 'Duplizieren')">
+                                @csrf
+                                <button type="submit" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm" title="Duplizieren">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                </button>
+                            </form>
                             <form action="{{ route('reports.regenerate-pdf', $report) }}" method="POST" class="inline" x-data @submit.prevent="confirmAction($el, 'PDF neu generieren', 'Möchten Sie das PDF neu generieren?', 'Generieren')">
                                 @csrf
                                 <button type="submit" class="px-3 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm" title="PDF neu generieren">
@@ -100,6 +106,12 @@
                             </form>
                         @endif
                         @if(Auth::user()->isDeveloper())
+                            <form action="{{ route('reports.duplicate', $report) }}" method="POST" class="inline" x-data @submit.prevent="confirmAction($el, 'Bericht duplizieren', 'Möchten Sie diesen Bericht als neuen Entwurf duplizieren?', 'Duplizieren')">
+                                @csrf
+                                <button type="submit" class="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm" title="Duplizieren">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                </button>
+                            </form>
                             <form action="{{ route('reports.regenerate-pdf', $report) }}" method="POST" class="inline" x-data @submit.prevent="confirmAction($el, 'PDF neu generieren', 'Möchten Sie das PDF neu generieren?', 'Generieren')">
                                 @csrf
                                 <button type="submit" class="px-3 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-lg text-sm" title="PDF neu generieren">

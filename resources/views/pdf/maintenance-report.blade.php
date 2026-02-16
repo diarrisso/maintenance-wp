@@ -13,8 +13,8 @@
         .header-logo { display: table-cell; vertical-align: middle; width: 150px; }
         .header-logo img { max-height: 60px; max-width: 140px; }
         .header-title { display: table-cell; vertical-align: middle; text-align: right; }
-        .header-title h1 { margin: 0; font-size: 22pt; color: #ffffff; }
-        .header-title p { margin: 5px 0 0; font-size: 12pt; color: #ffffff; }
+        .header-title h1 { margin: 0; font-size: 22pt; }
+        .header-title p { margin: 5px 0 0; font-size: 12pt; color: #374151; }
 
         .client-info { border: 1px solid #e2e8f0; padding: 15px 20px; margin: 0 20px 20px; }
         .client-header { display: table; width: 100%; margin-bottom: 10px; }
@@ -44,22 +44,22 @@
 </head>
 <body>
     {{-- Header avec logo agence --}}
-    <div style="background-color: {{ $primaryColor }}; color: #ffffff; padding: 20px 30px; margin-bottom: 20px;">
+    <div style="padding: 20px 30px; margin-bottom: 20px; border-bottom: 2px solid {{ $primaryColor }};">
         <div class="header-content">
             <div class="header-logo">
-                @if($agency->logo_white_path && file_exists($agency->logo_white_path))
-                    <img src="{{ $agency->logo_white_path }}" alt="{{ $agency->name }}">
-                @elseif($agency->logo_path && file_exists($agency->logo_path))
+                @if($agency->logo_path && file_exists($agency->logo_path))
                     <img src="{{ $agency->logo_path }}" alt="{{ $agency->name }}">
+                @elseif($agency->logo_white_path && file_exists($agency->logo_white_path))
+                    <img src="{{ $agency->logo_white_path }}" alt="{{ $agency->name }}">
                 @elseif(file_exists(public_path('img/80-30_Bildmarke_RGB_24.svg')))
                     <img src="{{ public_path('img/80-30_Bildmarke_RGB_24.svg') }}" alt="{{ $agency->name }}">
                 @else
-                    <span style="font-size: 18pt; font-weight: bold; color: #ffffff;">{{ substr($agency->name, 0, 2) }}</span>
+                    <span style="font-size: 18pt; font-weight: bold; color: {{ $primaryColor }};">{{ substr($agency->name, 0, 2) }}</span>
                 @endif
             </div>
             <div class="header-title">
-                <h1 style="color: #ffffff;">Wartungsbericht</h1>
-                <p style="color: #ffffff;">WordPress Maintenance Report</p>
+                <h1 style="color: {{ $primaryColor }};">Wartungsbericht</h1>
+                <p style="color: #374151;">WordPress Maintenance Report</p>
             </div>
         </div>
     </div>
@@ -102,10 +102,10 @@
     @if($report->website_condition)
         @php
             $conditionColors = [
-                'excellent' => ['bg' => '#ecfdf5', 'border' => '#10b981', 'text' => '#065f46'],
-                'good' => ['bg' => '#eff6ff', 'border' => '#3b82f6', 'text' => '#1e40af'],
-                'needs_improvement' => ['bg' => '#fefce8', 'border' => '#eab308', 'text' => '#854d0e'],
-                'critical' => ['bg' => '#fef2f2', 'border' => '#ef4444', 'text' => '#991b1b'],
+                'excellent' => ['border' => '#10b981', 'text' => '#065f46'],
+                'good' => ['border' => '#3b82f6', 'text' => '#1e40af'],
+                'needs_improvement' => ['border' => '#eab308', 'text' => '#854d0e'],
+                'critical' => ['border' => '#ef4444', 'text' => '#991b1b'],
             ];
             $conditionLabels = [
                 'excellent' => '🌟 Ausgezeichnet',
@@ -156,6 +156,12 @@
                         <div class="info-label">Techniker:</div>
                         <div class="info-value"><strong>{{ $report->user->name ?? 'N/A' }}</strong></div>
                     </div>
+                </div>
+            @endif
+            @if($report->signature)
+                <div style="margin-top: 15px; border-top: 1px solid #e2e8f0; padding-top: 10px;">
+                    <div style="font-size: 9pt; color: #6b7280; margin-bottom: 5px;">Unterschrift:</div>
+                    <img src="{{ $report->signature }}" style="max-height: 80px; max-width: 250px;" alt="Unterschrift">
                 </div>
             @endif
         </div>
@@ -353,10 +359,10 @@
             <h2 style="color: {{ $primaryColor }}; border-bottom: 2px solid {{ $primaryColor }}; padding-bottom: 5px; margin-top: 25px; font-size: 14pt;">Empfehlungen für den Kunden</h2>
             @php
                 $priorityColors = [
-                    'critical' => ['bg' => '#fef2f2', 'border' => '#ef4444', 'text' => '#991b1b'],
-                    'high' => ['bg' => '#fff7ed', 'border' => '#f97316', 'text' => '#9a3412'],
-                    'medium' => ['bg' => '#fefce8', 'border' => '#eab308', 'text' => '#854d0e'],
-                    'low' => ['bg' => '#eff6ff', 'border' => '#3b82f6', 'text' => '#1e40af'],
+                    'critical' => ['border' => '#ef4444', 'text' => '#991b1b'],
+                    'high' => ['border' => '#f97316', 'text' => '#9a3412'],
+                    'medium' => ['border' => '#eab308', 'text' => '#854d0e'],
+                    'low' => ['border' => '#3b82f6', 'text' => '#1e40af'],
                 ];
                 $priorityLabels = ['critical' => 'Kritisch', 'high' => 'Hoch', 'medium' => 'Mittel', 'low' => 'Niedrig'];
                 $typeLabels = ['security' => 'Sicherheit', 'plugin' => 'Plugin', 'theme' => 'Theme', 'performance' => 'Performance', 'other' => 'Sonstige'];
