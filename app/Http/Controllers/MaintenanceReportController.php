@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
-use Spatie\LaravelPdf\Facades\Pdf;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use App\Services\TeamsNotificationService;
 use App\Mail\ReportReadyForSendingMail;
@@ -290,9 +290,8 @@ class MaintenanceReportController extends Controller
         $filename = 'wartungsbericht_' . $report->website->name . '_' . $report->maintenance_date->format('Y-m-d') . '.pdf';
         $path = 'reports/' . $filename;
 
-        Pdf::view('pdf.maintenance-report', compact('report'))
-            ->format('a4')
-            ->save(storage_path('app/public/' . $path));
+        $pdf = Pdf::loadView('pdf.maintenance-report', compact('report'));
+        Storage::disk('public')->put($path, $pdf->output());
 
         $report->update([
             'status' => 'completed',
@@ -398,9 +397,8 @@ class MaintenanceReportController extends Controller
         $filename = 'wartungsbericht_' . $report->website->name . '_' . $report->maintenance_date->format('Y-m-d') . '.pdf';
         $path = 'reports/' . $filename;
 
-        Pdf::view('pdf.maintenance-report', compact('report'))
-            ->format('a4')
-            ->save(storage_path('app/public/' . $path));
+        $pdf = Pdf::loadView('pdf.maintenance-report', compact('report'));
+        Storage::disk('public')->put($path, $pdf->output());
 
         $report->update(['pdf_path' => $path]);
 
