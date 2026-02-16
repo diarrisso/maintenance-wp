@@ -416,7 +416,7 @@ class MaintenanceReportController extends Controller
             ]));
         }
 
-        foreach ($report->recommendations as $rec) {
+        foreach ($report->recommendations()->get() as $rec) {
             $newReport->recommendations()->create($rec->only([
                 'type', 'priority', 'title', 'description', 'action',
                 'current_item', 'suggested_item',
