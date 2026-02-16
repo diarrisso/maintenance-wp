@@ -491,7 +491,7 @@
 
     {{-- Additional notes --}}
     @if($report->recommendations)
-        <div style="border: 1px solid {{ $navy }}; padding: 10px 15px; margin: 15px 0; font-size: 9pt;">
+        <div style="padding: 10px 0; font-size: 9pt;">
             <strong style="color: {{ $navy }};">Zusätzliche Hinweise:</strong><br>
             {!! nl2br(e($report->recommendations)) !!}
         </div>
